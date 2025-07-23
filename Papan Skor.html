@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<title>Skor Sparing Beladiri</title>
+	<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+
+	<style>
+		/* ================================================ 🎨 ROOT & GLOBAL RESETS ================================================ */
+		:root {
+			--red-color: #ff4e50;
+			--blue-color: #00c6ff;
+			--bg-light: linear-gradient(to bottom, white, red);
+			--text-dark: #222;
+			--accent: #ffc107;
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Quicksand', sans-serif;
+			margin: 0;
+			padding: 0;
+			min-height: 100vh;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			background: #121212; /* url('bg.png') no-repeat center center fixed; */
+			background-size: cover;
+			color: var(--text-dark);
+			opacity: 0;
+			animation: fadeInBody 1s ease-in-out forwards;
+		}
+		
+		/* body::before */ {
+			content: "";
+			position: fixed;
+			inset: 0;
+			background: url('bg.png') center/cover no-repeat;
+			z-index: -1;
+			pointer-events: none; /* Biar nggak ganggu klik */
+			filter: brightness(1.1); /* Optional efek estetik */
+		}
+
+		@keyframes fadeInBody {
+			to {
+				opacity: 1;
+			}
+		}
+
+		/* ================================================ 📦 CONTAINER & HEADING ================================================ */
+		.container {
+			max-width: 1000px;
+			width: 100%;
+			padding: 20px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 20px;
+		}
+
+		h1 {
+			 ffont-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 32px;
+  color: white;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 20px;
+		}
+		
+		h1::after {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 4px;
+  background: white;
+  margin: 10px auto 0;
+  border-radius: 2px;
+}
+
+		/* ================================================ 🧮 SCOREBOARD & CORNERS ================================================ */
+		.scoreboard {
+			display: flex;
+			justify-content: center;
+			gap: 20px;
+			flex-wrap: wrap;
+			width: 100%;
+		}
+
+		.corner {
+			flex: 1 1 40%;
+			font-size: 2.5rem;
+			font-weight: bold;
+			color: #fff;
+			border-radius: 20px;
+			padding: 30px;
+			text-align: center;
+			background: linear-gradient(145deg, #333, #111);
+			box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+			transition: transform 0.3s;
+		}
+
+		.red {
+			background: linear-gradient(to right, #ff4e50, #f00000);
+		}
+
+		.blue {
+			background: linear-gradient(to right, #00c6ff, #0072ff);
+		}
+
+		.corner.bounce {
+			animation: bounce 0.3s;
+		}
+
+		@keyframes bounce {
+			0% { transform: scale(1); }
+			50% { transform: scale(1.1); }
+			100% { transform: scale(1); }
+		}
+
+		/* ================================================ 🎛️ CONTROLS ================================================ */
+		.controls {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+			justify-content: center;
+			width: 100%;
+		}
+
+		.controls input,
+		.controls button {
+			flex: 1 1 150px;
+			min-width: 120px;
+			border-radius: 25px;
+			color: white;
+			padding: 10px;
+			border: none;
+			font-size: 14px;
+			font-weight: 600;
+			background-color: rgba(255,255,255,0.1);				/* Lapisan putih transparan agar teks terlihat */
+			backdrop-filter: blur(15px);             			   	/* Blur latar belakang */
+			-webkit-backdrop-filter: blur(15px);     				/* Untuk Safari */
+			border: 1px solid rgba(255, 255, 255, 0.3);  			/* Garis putih tipis di pinggir */
+			/* box-shadow: 0 0 20px rgba(255, 255, 255, 0.1); */			/* Tambahan bayangan lembut */
+		}
+
+		.controls button {
+			background: var(--accent);
+			color: #000;
+			cursor: pointer;
+			transition: background 0.3s;
+		}
+
+		.controls button:hover {
+			background: #ffd54f;
+		}
+
+		/* ================================================ ⏱️ TIMER DISPLAY ================================================ */
+		.timer {
+			font-size: 1.8rem;
+			font-weight: bold;
+			color: white;
+			text-align: center;
+		}
+
+		/* ================================================ 🧾 LOG BOX ================================================ */
+		.log {
+			display: flex;
+			gap: 10px;
+			width: 100%;
+			flex-wrap: wrap;
+		}
+
+		.log-box {
+			flex: 1 1 45%;
+			height: 150px;
+			overflow-y: auto;
+			padding: 10px;
+			color: white;
+			border-radius: 10px;
+			background-color: rgba(255, 255, 255, 0.1);				/* Lapisan putih transparan agar teks terlihat */
+			backdrop-filter: blur(7px);             			   	/* Blur latar belakang */
+			-webkit-backdrop-filter: blur(7px);     				/* Untuk Safari */
+			border: 1px solid rgba(255, 255, 255, 0.3);  			/* Garis putih tipis di pinggir */
+			/* box-shadow: 0 0 20px rgba(255, 255, 255, 0.1); */ 			/* Tambahan bayangan lembut */
+			font-size: 14px;
+			position: relative;
+			z-index: 2;
+		}
+		
+		.log-box::-webkit-scrollbar {
+			width: 8px;
+		}
+
+		.log-box::-webkit-scrollbar-track {
+			background: transparent;
+			border-radius: 10px;
+		}
+
+		.log-box::-webkit-scrollbar-thumb {
+			background: rgba(255, 255, 255, 0.4); /* transparan putih */
+			border-radius: 10px;
+			backdrop-filter: blur(5px);
+		}
+
+		.log-box::-webkit-scrollbar-thumb:hover {
+			background: rgba(255, 255, 255, 0.6);
+		}
+
+		/* Firefox support */
+		.log-box {
+			scrollbar-width: thin;
+			scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
+		}
+
+		/* ================================================ 📊 STATS ================================================ */
+		.stats {
+			color: white;
+			text-align: center;
+			font-size: 12px;
+			font-style: italic;
+		}
+
+		/* ================================================ 🏆 WINNER OVERLAY ================================================ */
+		.winner-overlay {
+			position: fixed;
+			top: 0; left: 0; right: 0; bottom: 0;
+			background: rgba(0, 0, 0, 0.85);
+			display: none;
+			align-items: center;
+			justify-content: center;
+			color: white;
+			z-index: 1000;
+			flex-direction: column;
+			animation: fadeIn 0.4s ease-out;
+			text-align: center;
+			padding: 20px;
+		}
+
+		@keyframes fadeIn {
+			from { opacity: 0; transform: scale(0.9); }
+			to { opacity: 1; transform: scale(1); }
+		}
+
+		.winner-overlay #winnerText {
+			font-size: 2rem;
+			font-weight: bold;
+			color: gold;
+			text-shadow: 0 0 20px gold;
+			margin-bottom: 20px;
+		}
+
+		.winner-overlay button {
+			border: none;
+			border-radius: 30px;
+			padding: 12px 24px;
+			font-weight: bold;
+			font-size: 1rem;
+			background: linear-gradient(to right, #ffc107, #ff9800);
+			color: #000;
+			cursor: pointer;
+			box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+			transition: transform 0.2s;
+		}
+
+		.winner-overlay button:hover {
+			transform: scale(1.05);
+		}
+
+		/* ================================================ 📱 RESPONSIVE ================================================ */
+		@media (max-width: 768px) {
+			.corner {
+				font-size: 2rem;
+				padding: 20px;
+			}
+
+			.timer {
+				font-size: 1.5rem;
+			}
+		}
+
+		@media (max-width: 480px) {
+			.controls input,
+			.controls button {
+				font-size: 12px;
+				padding: 8px;
+			}
+
+			.corner {
+				font-size: 1.5rem;
+			}
+
+			.winner-overlay #winnerText {
+				font-size: 1.5rem;
+			}
+
+			.winner-overlay button {
+				font-size: 0.9rem;
+			}
+		}
+
+		/* ================================================ 📘 INSTRUCTION POPUP ================================================ */
+		#showInstructions {
+			position: fixed;
+			top: 20px; /* dari atas */
+			left: 50%; /* tengah horizontal */
+			transform: translateX(-50%); /* geser ke kiri 50% agar benar-benar di tengah */
+			z-index: 9999;
+			padding: 10px 18px;
+			font-size: 14px;
+			font-weight: 500;
+			color: #fff;
+			background: rgba(255, 255, 255, 0.1);
+			border: 1px solid rgba(255, 255, 255, 0.2);
+			border-radius: 999px;
+			backdrop-filter: blur(10px);
+			-webkit-backdrop-filter: blur(10px);
+			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+			cursor: pointer;
+			transition: all 0.3s ease;
+			font-family: 'Quicksand', sans-serif;
+		}
+
+		#showInstructions:hover {
+			background: rgba(255, 255, 255, 0.2);
+			transform: translateX(-50%) translateY(-2px);
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+		}
+
+		#showInstructions:active {
+			transform: translateX(-50%) scale(0.95);
+			background: rgba(255, 255, 255, 0.25);
+		}
+		
+		#instructionCard {
+			position: fixed;
+			top: 0; left: 0; right: 0; bottom: 0;
+			background: rgba(0, 0, 0, 0.85);
+			display: none;
+			align-items: center;
+			justify-content: center;
+			z-index: 9999;
+			padding: 20px;
+		}
+
+		#instructionCard .popup-content {
+			background: #fff;
+			color: #000;
+			padding: 20px 25px;
+			border-radius: 15px;
+			max-width: 600px;
+			width: 100%;
+			box-shadow: 0 0 15px rgba(0,0,0,0.4);
+			text-align: left;
+			font-size: 15px;
+			line-height: 1.6;
+			overflow-y: auto;
+			max-height: 90vh;
+		}
+
+		#instructionCard button {
+			margin-top: 20px;
+			float: right;
+			padding: 8px 16px;
+			font-weight: bold;
+			border: none;
+			border-radius: 10px;
+			background: var(--accent);
+			color: #000;
+			cursor: pointer;
+		}
+
+		#instructionCard h2 {
+			margin-top: 0;
+			font-size: 1.5rem;
+		}
+
+		@media (max-width: 480px) {
+			#instructionCard .popup-content {
+				font-size: 14px;
+				padding: 15px;
+			}
+
+			#instructionCard h2 {
+				font-size: 1.3rem;
+			}
+
+			#instructionCard button {
+				font-size: 0.9rem;
+				padding: 6px 12px;
+			}
+		}
+
+		/* ================================================ 📲 MOBILE CONTROLS ================================================ */
+		.mobile-controls-v2 {
+			display: none;
+			position: fixed;
+			bottom: 0;
+			width: 100%;
+			height: auto;
+			backdrop-filter: blur(12px);
+			background: rgba(255, 255, 255, 0.3);
+			padding: 12px 16px;
+			box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+			display: flex;
+			justify-content: space-between;
+			align-items: flex-end;
+			font-family: 'Quicksand', sans-serif;
+			z-index: 999;
+			border-radius: 20px 20px 0 0;
+			transition: all 0.3s ease;
+		}
+
+		.mobile-controls-v2 .side-controls {
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+			width: 30%;
+		}
+
+		.mobile-controls-v2 .middle-controls {
+			width: 35%;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.mobile-controls-v2 button {
+			padding: 10px;
+			font-size: 14px;
+			font-weight: 600;
+			border: none;
+			border-radius: 999px;
+			background: rgba(240, 240, 240, 0.8);
+			color: #333;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+			backdrop-filter: blur(4px);
+			transition: all 0.2s ease;
+			width: 100%;
+		}
+
+		.mobile-controls-v2 button:hover {
+			background: rgba(220, 220, 220, 0.9);
+		}
+
+		.mobile-controls-v2 button:active {
+			background: rgba(200, 200, 200, 1);
+			transform: scale(0.98);
+		}
+
+		#mobile-start-stop {
+			font-size: 20px;
+			padding: 14px;
+			background: linear-gradient(135deg, #00aaff, #0077cc);
+			color: white;
+			border-radius: 999px;
+		}
+
+		#toggleMobileUI {
+			display: none;
+		}
+
+		@media only screen and (max-width: 1280px) {
+			#toggleMobileUI {
+				display: block !important;
+				position: fixed;
+				bottom: 80px;
+				left: 50%;
+				transform: translateX(-50%);
+				z-index: 9999;
+				background: rgba(255, 255, 255, 0.4);
+				backdrop-filter: blur(6px);
+				border: 1px solid #aaa;
+				border-radius: 999px;
+				padding: 8px 16px;
+				font-size: 13px;
+				font-family: 'Quicksand', sans-serif;
+				box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+				cursor: pointer;
+				transition: background 0.2s ease;
+			}
+
+			#toggleMobileUI:hover {
+				background: rgba(255, 255, 255, 0.6);
+			}
+		}
+
+		@media (max-width: 1280px) {
+			.mobile-controls-v2 {
+				display: flex;
+			}
+		}
+
+/* ======== HILANGKAN SPINNER INPUT NUMBER ======== */
+
+/* Chrome, Safari, Edge, Opera */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* ======== GAYA ESTETIK UNTUK INPUT ANGKA ======== */
+.input-number {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  color: white;
+  padding: 6px 10px;
+  width: 100px;
+  text-align: center;
+  backdrop-filter: blur(4px);
+  font-weight: bold;
+}
+
+#nameRed::placeholder,
+#nameBlue::placeholder {
+  color: white;
+  opacity: 0.6;
+  text-align: center;
+}
+
+#nameRed,
+#nameBlue {
+  text-align: center; /* Ini yang membuat teks tetap di tengah saat diketik */
+}
+
+/* === STYLE UMUM UNTUK SEMUA INPUT === */
+input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  color: white;
+  padding: 8px 12px;
+  backdrop-filter: blur(4px);
+  font-weight: bold;
+  text-align: center;
+  height: 40px;
+}
+
+/* HILANGKAN OUTLINE JELEK SAAT DIKLIK */
+input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+  transition: box-shadow 0.2s ease;
+}
+
+/* TAMPILAN SAAT AUTOFILL DARI BROWSER */
+input:-webkit-autofill {
+  box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important;
+  -webkit-text-fill-color: white !important;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+
+
+
+	</style>
+</head>
+<body>
+
+	<!-- 🔘 Tombol Mode Malam & Instruksi -->
+	<div class="night-toggle">
+		<button id="showInstructions">📘 Instruksi</button>
+	</div>
+  
+	<!-- 👁️ Tombol Toggling UI Mobile (Hide/Show Kontrol) -->
+	<button id="toggleMobileUI" class="toggle-mobile-ui">👁️ Sembunyikan Kontrol</button>
+	
+	<!-- 🥋 Judul dan Input Awal (Nama, Ronde, Timer) -->
+	<div class="container">
+		<h1>Skor Sparing</h1>
+    
+		<div class="controls">
+			<input type="text" id="nameRed" placeholder="Nama Merah">
+			<input type="text" id="nameBlue" placeholder="Nama Biru">
+			<input type="number" class="input-number" id="round" placeholder="Ronde" min="1" value="1">
+			<input type="number" class="input-number" id="timerSet" placeholder="Timer (detik)" min="10" value="90">
+			<button onclick="resetScore()">Reset</button>
+		</div>
+
+		<!-- 🎯 Skor Utama -->
+		<div class="scoreboard">
+			<div class="corner red" id="scoreRed">0</div>
+			<div class="corner blue" id="scoreBlue">0</div>
+		</div>
+
+		<!-- ⏱️ Timer -->
+		<div class="timer" id="timer">01:30.00</div>
+
+		<!-- 🧾 Log Aksi Sudut Merah dan Biru -->
+		<div class="log">
+			<div class="log-box" id="logRed"></div>
+			<div class="log-box" id="logBlue"></div>
+		</div>
+
+		<!-- 📊 Statistik Otomatis -->
+		<div class="stats" id="stats"></div>
+	</div>
+
+	<!-- 🏆 Overlay Pemenang -->
+	<div class="winner-overlay" id="winner">
+		<div id="winnerText"></div>
+		<button onclick="closeWinner()">Tutup</button>
+	</div>
+
+	<!-- 📱 Kontrol Mobile: Sudut Merah, Tengah (Start/Stop), Sudut Biru -->
+	<div id="mobile-controls" class="mobile-controls-v2">
+		<!-- 🔴 Sudut Merah -->
+		<div class="side-controls red-side">
+			<button onclick="addPoint('red', 1, 'Pukulan')">+1<br>Pukulan</button>
+			<button onclick="addPoint('red', 2, 'Tendangan')">+2<br>Tendangan</button>
+			<button onclick="addPoint('red', 3, 'Bantingan')">+3<br>Bantingan</button>
+			<button onclick="addPoint('red', -1, 'Pelanggaran')">-1<br>Pelanggaran</button>
+		</div>
+
+		<!-- ▶️ Start/Stop Tengah -->
+		<div class="middle-controls">
+			<button id="mobile-start-stop" onclick="toggleTimer()">▶ / ⏸</button>
+		</div>
+
+		<!-- 🔵 Sudut Biru -->
+		<div class="side-controls blue-side">
+			<button onclick="addPoint('blue', 1, 'Pukulan')">+1<br>Pukulan</button>
+			<button onclick="addPoint('blue', 2, 'Tendangan')">+2<br>Tendangan</button>
+			<button onclick="addPoint('blue', 3, 'Bantingan')">+3<br>Bantingan</button>
+			<button onclick="addPoint('blue', -1, 'Pelanggaran')">-1<br>Pelanggaran</button>
+			</div>
+	</div>
+
+	<!-- 📘 Kartu Instruksi Lengkap -->
+	<div id="instructionCard">
+		<div class="popup-content">
+			<h2 style="margin-top: 0;">📘 Panduan Penggunaan</h2>
+			<ul style="line-height: 1.8; padding-left: 20px;">
+				<li><b>Langkah Awal:</b>
+					<ul>
+						<li>Isi nama atlet untuk sudut <b>Merah</b> dan <b>Biru</b>.</li>
+						<li>Masukkan ronde dan durasi waktu (dalam detik).</li>
+						<li>Gunakan tombol <b>Reset</b> untuk mengatur ulang skor, log, dan statistik.</li>
+					</ul>
+				</li>
+
+				<li><b>Kontrol Timer:</b>
+					<ul>
+						<li>Mulai / Jeda waktu = <b>Spasi</b> (keyboard) atau tombol tengah ⏯️ di mobile.</li>
+						<li>Timer berhenti otomatis saat waktu habis atau saat terjadi <b>bantingan</b>.</li>
+					</ul>
+				</li>
+
+				<li><b>Input Skor (Keyboard):</b>
+					<ul>
+						<li>+1 (Pukulan) Merah = <b>A</b></li>
+						<li>+2 (Tendangan) Merah = <b>D</b></li>
+						<li>+3 (Bantingan) Merah = <b>W</b></li>
+						<li>-1 (Pelanggaran oleh Merah) = <b>S</b></li>
+						<li>+1 (Pukulan) Biru = <b>← (Arrow Left)</b></li>
+						<li>+2 (Tendangan) Biru = <b>→ (Arrow Right)</b></li>
+						<li>+3 (Bantingan) Biru = <b>↑(Arrow Up)</b> </li>
+						<li>-1 (Pelanggaran oleh Biru) = <b>↓ (Arrow Down)</b></li>
+						<li><b>Undo</b> poin terakhir = <b>Z</b></li>
+					</ul>
+				</li>
+
+				<li><b>Kontrol Joystick (Opsional):</b>
+					<ul>
+						<li>+1 Merah = <b>L1</b></li>
+						<li>+2 Merah = <b>L2</b></li>
+						<li>+3 Merah = <b>D-pad Atas</b></li>
+						<li>-1 Merah = <b>D-pad Kiri</b></li>
+						<li>+1 Biru = <b>R1</b></li>
+						<li>+2 Biru = <b>R2</b></li>
+						<li>+3 Biru = <b>Y (Segitiga)</b></li>
+						<li>-1 Biru = <b>B (Lingkaran)</b></li>
+						<li>Mulai / Jeda Timer = <b>A (Silang)</b></li>
+						<li>Reset = <b>X (Kotak)</b></li>
+						<li>Undo = <b>D-pad Kanan</b></li>
+					</ul>
+				</li>
+
+				<li><b>Kontrol Mobile:</b>
+					<ul>
+						<li>Tombol tersedia untuk masing-masing sudut (Merah & Biru) secara terpisah.</li>
+						<li>Gunakan tombol <b>👁️ Sembunyikan Kontrol</b> untuk menyembunyikan/munculkan UI Mobile.</li>
+					</ul>
+				</li>
+
+				<li><b>Log & Statistik:</b>
+					<ul>
+						<li>Setiap aksi dicatat di kolom log masing-masing sudut.</li>
+						<li>Statistik mencakup jumlah serangan dan pelanggaran dari masing-masing atlet.</li>
+					</ul>
+				</li>
+
+				<li><b>Penentuan Pemenang:</b>
+					<ul>
+						<li>Saat timer habis, sistem akan menampilkan pemenang berdasarkan skor tertinggi.</li>
+						<li>Jika skor imbang, tidak ada pemenang otomatis yang ditentukan.</li>
+					</ul>
+				</li>
+
+				<li><b>Tips Penggunaan:</b>
+					<ul>
+						<li>Gunakan joystick untuk pengalaman lebih cepat & efisien.</li>
+						<li>Gunakan tombol <b>📘 Instruksi</b> kapan saja untuk membuka panduan ini.</li>
+						<li>Web ini dibuat oleh Dava Zabal.</li>
+					</ul>
+				</li>
+			</ul>
+			<div style="text-align: right; margin-top: 20px;">
+				<button onclick="closeInstructions()">Tutup</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- 🔊 Audio Peluit -->
+	<audio id="whistle">
+		<source src="https://www.soundjay.com/button/beep-07.wav" type="audio/wav">
+	</audio>
+  
+	<script>
+		// ====== VARIABEL UTAMA ======
+		let scoreRed = 0;
+		let scoreBlue = 0;
+		let isRunning = false;
+		let logs = { red: [], blue: [] };
+		let stats = {
+			red: { '+1': 0, '+2': 0, '+3': 0, '-1': 0 },
+			blue: { '+1': 0, '+2': 0, '+3': 0, '-1': 0 }
+		};
+		let history = [];
+		let timerInterval;
+		let totalTime = 90 * 1000;
+		let timeLeft = totalTime;
+		let hasTimerStarted = false;
+
+		// ====== FUNGSI UTAMA SKOR ======
+		const updateScores = () => {
+			document.getElementById("scoreRed").textContent = scoreRed;
+			document.getElementById("scoreBlue").textContent = scoreBlue;
+		};
+
+		const updateLog = () => {
+			document.getElementById("logRed").innerHTML = logs.red.join('<br>');
+			document.getElementById("logBlue").innerHTML = logs.blue.join('<br>');
+			document.getElementById("stats").textContent =
+				`MERAH | Pukulan: ${stats.red['+1']}, Tendangan: ${stats.red['+2']}, Bantingan: ${stats.red['+3']}, Pelanggaran: ${stats.red['-1']} || ` +
+				`BIRU | Pukulan: ${stats.blue['+1']}, Tendangan: ${stats.blue['+2']}, Bantingan: ${stats.blue['+3']}, Pelanggaran: ${stats.blue['-1']}`;
+		};
+
+		const addPoint = (corner, value, type) => {
+			if (timeLeft <= 0) return;
+			if (type === 'Bantingan') {
+    // ❌ Blokir jika timer belum pernah dimulai
+    if (!hasTimerStarted) return;
+
+    // ✅ Hanya izinkan saat timer TIDAK berjalan
+    if (isRunning) return;
+}
+
+// Untuk Pukulan dan Tendangan hanya boleh saat timer berjalan
+if ((type === 'Pukulan' || type === 'Tendangan') && !isRunning) return;
+
+// Untuk Pelanggaran hanya boleh saat timer berhenti
+if (type === 'Pelanggaran' && isRunning) return;
+
+
+			corner === 'red' ? scoreRed += value : scoreBlue += value;
+			history.push({ corner, value });
+			logs[corner].push(`${type} (${value > 0 ? '+' : ''}${value})`);
+
+			const key = `${value > 0 ? '+' : ''}${value}`;
+			if (stats[corner][key] !== undefined) stats[corner][key]++;
+
+			updateScores();
+			updateLog();
+		};
+
+		const undo = () => {
+			if (timeLeft <= 0 || history.length === 0) return;
+			const last = history.pop();
+			last.corner === 'red' ? scoreRed -= last.value : scoreBlue -= last.value;
+			logs[last.corner].pop();
+			stats[last.corner][`${last.value > 0 ? '+' : ''}${last.value}`]--;
+			updateScores();
+			updateLog();
+		};
+
+		const resetScore = () => {
+			scoreRed = 0;
+			scoreBlue = 0;
+			logs = { red: [], blue: [] };
+			stats = {
+				red: { '+1': 0, '+2': 0, '+3': 0, '-1': 0 },
+				blue: { '+1': 0, '+2': 0, '+3': 0, '-1': 0 }
+			};
+			history = [];
+			updateScores();
+			updateLog();
+			resetTimer();
+		};
+
+		const startStop = () => {
+			const audio = document.getElementById('whistle');
+			audio.play();
+			isRunning = !isRunning;
+
+			if (isRunning) {
+				hasTimerStarted = true; // ✅ Timer pertama kali dimulai
+				timerInterval = setInterval(() => {
+					timeLeft -= 10;
+					const min = Math.floor(timeLeft / 60000);
+					const sec = Math.floor((timeLeft % 60000) / 1000);
+					const ms = Math.floor((timeLeft % 1000) / 10);
+					document.getElementById("timer").textContent =
+					`${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}.${String(ms).padStart(2, '0')}`;
+
+					if (timeLeft <= 0) {
+						clearInterval(timerInterval);
+						isRunning = false;
+						showWinner();
+					}
+				}, 10);
+			}
+			else {
+				clearInterval(timerInterval);
+			}
+		};
+
+		const toggleTimer = () => {
+			startStop();
+		};
+
+		const resetTimer = () => {
+			clearInterval(timerInterval);
+			const set = document.getElementById("timerSet").value;
+			timeLeft = set * 1000;
+			const min = Math.floor(timeLeft / 60000);
+			const sec = Math.floor((timeLeft % 60000) / 1000);
+			document.getElementById("timer").textContent =
+			`${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}.00`;
+			isRunning = false;
+		};
+
+		const showWinner = () => {
+			const red = scoreRed;
+			const blue = scoreBlue;
+			const nameRed = document.getElementById("nameRed").value || "Merah";
+			const nameBlue = document.getElementById("nameBlue").value || "Biru";
+			const winner = red > blue ? nameRed : blue > red ? nameBlue : "Seri";
+			const color = red > blue ? 'var(--red-color)' : blue > red ? 'var(--blue-color)' : 'gray';
+			document.getElementById("winnerText").textContent = `Pemenang: ${winner}`;
+			document.getElementById("winnerText").style.color = color;
+			document.getElementById("winner").style.display = 'flex';
+		};
+
+		const closeWinner = () => {
+			document.getElementById("winner").style.display = 'none';
+		};
+
+		document.getElementById("showInstructions").addEventListener("click", () => {
+			document.getElementById("instructionCard").style.display = "flex";
+		});
+
+		function closeInstructions() {
+			document.getElementById("instructionCard").style.display = "none";
+		}
+
+		// ====== JOYSTICK ======
+		let lastGamepadButtons = [];
+
+		function handleGamepadInput() {
+			const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+			const gp = gamepads[0];
+			if (!gp) return;
+
+			gp.buttons.forEach((button, index) => {
+				const pressed = button.pressed;
+				if (pressed && !lastGamepadButtons[index]) {
+					switch (index) {
+					case 0: startStop(); break;
+					case 1: addPoint('blue', -1, 'Pelanggaran'); break;
+					case 2: resetScore(); break;
+					case 3: addPoint('blue', 3, 'Bantingan'); break;
+					case 4: addPoint('red', 1, 'Pukulan'); break;
+					case 5: addPoint('blue', 1, 'Pukulan'); break;
+					case 6: addPoint('red', 2, 'Tendangan'); break;
+					case 7: addPoint('blue', 2, 'Tendangan'); break;
+					case 12: addPoint('red', 3, 'Bantingan'); break;
+					case 14: addPoint('red', -1, 'Pelanggaran'); break;
+					case 15: undo(); break;
+					}
+				}
+				lastGamepadButtons[index] = pressed;
+			});
+		}
+
+		function gamepadLoop() {
+			handleGamepadInput();
+			requestAnimationFrame(gamepadLoop);
+		}
+
+		window.addEventListener("gamepadconnected", () => {
+			console.log("🎮 Gamepad terdeteksi");
+			gamepadLoop();
+		});
+
+		// ====== KEYBOARD ======
+		document.addEventListener("keydown", (e) => {
+			const allowedWhenPaused = [' ', 'z', 'Z', 's', 'S', 'w', 'W', 'ArrowDown', 'ArrowUp'];
+			if (!isRunning && !allowedWhenPaused.includes(e.key)) return;
+
+			switch (e.key) {
+				case "a": case "A": addPoint('red', 1, 'Pukulan'); break;
+				case "d": case "D": addPoint('red', 2, 'Tendangan'); break;
+				case "w": case "W": addPoint('red', 3, 'Bantingan'); break;
+				case "s": case "S": addPoint('red', -1, 'Pelanggaran'); break;
+
+				case "ArrowLeft": addPoint('blue', 1, 'Pukulan'); break;
+				case "ArrowRight": addPoint('blue', 2, 'Tendangan'); break;
+				case "ArrowUp": addPoint('blue', 3, 'Bantingan'); break;
+				case "ArrowDown": e.preventDefault(); addPoint('blue', -1, 'Pelanggaran'); break;
+
+				case " ": startStop(); break;
+				case "z": case "Z": undo(); break;
+			}
+		});
+
+		// ====== RESPONSIVE MODE (MOBILE UI) ======
+		function checkIfMobile() {
+			const isMobile = window.innerWidth <= 1280;
+			const mobileControls = document.getElementById("mobile-controls");
+
+			if (mobileControls) {
+				mobileControls.style.display = isMobile && isMobileUIVisible ? "flex" : "none";
+			}
+
+			const toggleBtn = document.getElementById("toggleMobileUI");
+			if (toggleBtn) {
+				toggleBtn.style.display = isMobile ? "block" : "none";
+				toggleBtn.textContent = isMobileUIVisible ? "👁️" : "👁️";
+			}
+		}
+
+		window.addEventListener("resize", checkIfMobile);
+
+		// ====== TIMER SETUP ======
+		document.getElementById("timerSet").addEventListener("input", resetTimer);
+		resetTimer();
+
+		// ====== TOGGLE UI BUTTON ======
+		let isMobileUIVisible = true;
+
+		document.getElementById("toggleMobileUI").addEventListener("click", () => {
+			isMobileUIVisible = !isMobileUIVisible;
+			checkIfMobile();
+		});
+
+		// ====== INISIALISASI SAAT LOAD ======
+		window.addEventListener("DOMContentLoaded", () => {
+			checkIfMobile();
+		});
+
+    </script>
+</body>
+</html>
