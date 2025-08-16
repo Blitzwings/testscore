@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stopwatch Pencak Silat Interaktif</title>
+<style>
+:root{
+  --bg1:#ff7a7a; --bg2:#ff8c5a;
+  --panel:#0b0b0b; --text:#ffffff; --muted:#9aa0a6;
+  --pill:#ffffff; --pillText:#111; --outline:#2a2a2a;
+}
+.address {
+  position: absolute;
+  left: 80px;
+  right: 80px;
+  top: 8px;
+  height: 28px;
+  border-radius: 8px;
+  background: #3a3a3a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.address .watermark {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-decoration: none;
+  pointer-events: auto; /* supaya bisa diklik */
+  transition: color 0.2s;
+}
+
+.address .watermark:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Inter,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji";}
+body{background:radial-gradient(1200px 900px at 20% -10%, #ff9a9a 0%, var(--bg1) 30%, var(--bg2) 100%);display:grid;place-items:center;}
+.frame{width:min(960px,92vw);height:min(560px,70vh);border-radius:14px;background:linear-gradient(#2c2c2c,#222);box-shadow:0 20px 50px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.35);padding-top:42px;position:relative;}
+.traffic{position:absolute;inset:12px auto auto 14px;display:flex;gap:8px;}
+.dot{width:12px;height:12px;border-radius:50%}
+.dot.red{background:#ff5f57}
+.dot.yellow{background:#ffbd2e}
+.dot.green{background:#28c840}
+.address{position:absolute;left:80px;right:80px;top:8px;height:28px;border-radius:8px;background:#3a3a3a;}
+.app{position:absolute;inset:42px 0 0 0;background:var(--panel);color:var(--text);border-radius:0 0 14px 14px;display:flex;flex-direction:column;}
+header{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;color:#e9e9e9;font-weight:600;letter-spacing:.3px;}
+header .brand{opacity:.95;font-weight:800}
+header .sub{font-size:.72rem;color:var(--muted);font-weight:600;margin-left:6px}
+main{flex:1;display:grid;place-items:center;padding:18px;}
+.stack{display:flex;flex-direction:column;align-items:center;gap:22px;transform:translateY(-40px);}
+.seg{display:flex;gap:8px;background:#121212;padding:6px;border-radius:999px;border:1px solid var(--outline);}
+.seg button{appearance:none;border:0;padding:8px 14px;border-radius:999px;cursor:pointer;font-weight:600;letter-spacing:.2px;color:#d7d7d7;background:transparent;transition:.15s ease;}
+.seg button.active{background:#1f1f1f;color:#fff;box-shadow:inset 0 0 0 1px #2f2f2f}
+.time{font-size:min(16vw,120px);font-weight:800;letter-spacing:2px;line-height:1;text-align:center;transition: color 0.2s;}
+.time.near { color: #28c840; }
+.time.disqualified { color: #ff4c4c; animation: flash 0.5s ease-in-out; }
+@keyframes flash {0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+.actions{display:flex;align-items:center;gap:10px;position:relative;}
+.primary{background:var(--pill);color:var(--pillText);padding:10px 22px;border-radius:999px;border:0;font-weight:700;cursor:pointer;transition:.15s ease;letter-spacing:.3px;}
+.primary:hover{transform:translateY(-1px)}
+.icon{width:40px;height:40px;border-radius:999px;display:grid;place-items:center;border:1px solid var(--outline);background:#121212;cursor:pointer;}
+.icon svg{width:18px;height:18px;fill:#ddd}
+.muted{color:var(--muted)}
+#popupOverlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;justify-content:center;align-items:center;z-index:1000;}
+#popup{background:#222;padding:20px;border-radius:12px;max-width:90vw;color:#fff;display:flex;flex-direction:column;gap:8px;max-height:80vh;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,0.6);transform:translateY(-30px);opacity:0;transition:all 0.3s ease;}
+#popup.show{transform:translateY(0);opacity:1;}
+.popup-lap{font-size:0.85rem;color:#aaa;margin-bottom:4px;}
+.popup-final.success{color:#4caf50;font-size:1.3rem;font-weight:bold;margin-top:8px;}
+.popup-final.fail{color:#f44336;font-size:1.3rem;font-weight:bold;margin-top:8px;}
+#popupClose{align-self:flex-end;margin-top:10px;padding:6px 12px;border-radius:6px;background:#fff;color:#111;border:none;cursor:pointer;}
+#timeSetDialog{color:#fff;}
+#fullscreenBtn,#settingsBtn{position:absolute;bottom:14px;} 
+#fullscreenBtn{right:14px;}
+#settingsBtn{right:70px;}
+.dialog-row{display:flex;gap:4px;align-items:center;justify-content:center;}
+.dialog-row input{width:50px;padding:6px;border-radius:6px;border:1px solid #444;background:#111;color:#fff;text-align:center;}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;}
+.btn{padding:6px 12px;border-radius:6px;border:none;cursor:pointer;}
+.btn.secondary{background:#1b1b1b;color:#fff;border:1px solid #2b2b2b;}
+.btn.primary{background:#fff;color:#111;font-weight:700;}
+@media (max-width:520px){header{padding:0 16px}.time{letter-spacing:1px}.actions{gap:8px}}
+</style>
+</head>
+<body>
+<div class="frame" id="frame">
+  <div class="traffic">
+    <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+  </div>
+  <div class="address" aria-hidden="true">
+  <a href="https://Blitzwings.co/Matpulse" target="_blank" class="watermark">https://Blitzwings.co/Matpulse</a>
+</div>
+
+  <section class="app" id="app">
+    <header>
+      <div class="brand">MatPulse <span class="sub">beta</span></div>
+      <div class="muted" id="status"></div>
+    </header>
+    <main>
+      <div class="stack">
+        <div class="seg" role="tablist" aria-label="Modes">
+          <button class="active" data-mode="pomo" role="tab" aria-selected="true">Mode 1</button>
+          <button data-mode="short" role="tab" aria-selected="false">Mode 2</button>
+          <button data-mode="long" role="tab" aria-selected="false">Mode 3</button>
+        </div>
+        <div class="time" id="time">00:00:00</div>
+        <div class="actions">
+          <button class="primary" id="startBtn">Start</button>
+          <button class="icon" id="resetBtn" title="Reset"><svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.9 6h-2.06A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg></button>
+          <button class="icon" id="lapBtn" title="Cek/Lap"><svg viewBox="0 0 24 24"><path d="M12 6v6l4 2"/></svg></button>
+        </div>
+      </div>
+    </main>
+    <button class="icon" id="fullscreenBtn" title="Fullscreen"><svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm12 3h-3v2h5v-5h-2v3zM7 7h3V5H5v5h2V7zm12 3h2V5h-5v2h3v3z"/></svg></button>
+    <button class="icon" id="settingsBtn" title="Set Waktu Start"><svg viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm9.4 4a7.36 7.36 0 0 0-.14-1.4l2-1.57-2-3.46-2.44.99a7.8 7.8 0 0 0-2.42-1.41L14 .6h-4l-.98 2.55a7.8 7.8 0 0 0-2.42 1.41l-2.44-.99-2 3.46 2 1.57A7.36 7.36 0 0 0 2.6 12c0 .47.05.94.14 1.4l-2 1.57 2 3.46 2.44-.99a7.8 7.8 0 0 0 2.42 1.41L10 23.4h4l.98-2.55a7.8 7.8 0 0 0 2.42-1.41l2.44.99 2-3.46-2-1.57c.09-.46.14-.93.14-1.4z"/></svg></button>
+  </section>
+</div>
+
+<!-- Modal set waktu -->
+<dialog id="timeSetDialog">
+  <div style="background:#222;padding:20px;border-radius:12px;min-width:260px;display:flex;flex-direction:column;gap:12px;">
+    <h3 style="margin:0;color:#fff;">Set Waktu Start (Menit:Detik)</h3>
+    <div class="dialog-row">
+      <input type="number" id="startMin" min="0" max="59" value="0"> :
+      <input type="number" id="startSec" min="0" max="59" value="0">
+    </div>
+    <div class="modal-actions">
+      <button class="btn secondary" id="cancelTimeSet">Batal</button>
+      <button class="btn primary" id="saveTimeSet">Simpan</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- Custom popup -->
+<div id="popupOverlay">
+  <div id="popup">
+    <div id="popupContent"></div>
+    <button id="popupClose">Tutup</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const $ = (s,ctx=document)=>ctx.querySelector(s);
+  const $$ = (s,ctx=document)=>[...ctx.querySelectorAll(s)];
+  const timeEl = $('#time'), startBtn = $('#startBtn'), resetBtn = $('#resetBtn'), lapBtn = $('#lapBtn'),
+        segButtons = $$('.seg button'), statusEl = $('#status');
+  const settingsBtn = $('#settingsBtn'), fullscreenBtn = $('#fullscreenBtn');
+  const timeSetDialog = $('#timeSetDialog'), startMin = $('#startMin'), startSec = $('#startSec');
+  const cancelTimeSet = $('#cancelTimeSet'), saveTimeSet = $('#saveTimeSet');
+  const popupOverlay = $('#popupOverlay'), popupContent = $('#popupContent'), popupClose = $('#popupClose');
+
+  const targets={pomo:90,short:120,long:180},tolerance=10;
+  let mode='pomo',elapsed=0,running=false,startTime=null,lapLogs=[],lapMaxCount={pomo:0,short:1,long:2};
+
+  // Tambahkan audio
+  const gong = new Audio('gong.mp3');
+  const cek  = new Audio('cek.mp3');
+
+  function fmt(sec){
+    const m=Math.floor(sec/60);
+    const s=Math.floor(sec%60);
+    const ms=Math.floor((sec-Math.floor(sec))*100);
+    return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}:${String(ms).padStart(2,'0')}`;
+  }
+
+  function render(){
+    timeEl.textContent=fmt(elapsed);
+    segButtons.forEach(b=>{
+      const active=b.dataset.mode===mode;
+      b.classList.toggle('active',active);
+      b.setAttribute('aria-selected',active?'true':'false');
+    });
+    startBtn.textContent=running?'Pause':'Start';
+    statusEl.textContent=running?'Counting…':'';
+  }
+
+  function setMode(m){
+    mode=m;
+    stop();
+    elapsed=0;
+    lapLogs=[];
+    timeEl.classList.remove('near','disqualified');
+    render();
+  }
+
+  function tick(){
+    if(!running) return;
+    elapsed=(performance.now()-startTime)/1000;
+    const target=targets[mode];
+    if(elapsed>target-tolerance && elapsed<target+tolerance){
+      timeEl.classList.add('near');
+    } else {
+      timeEl.classList.remove('near');
+    }
+    render();
+    requestAnimationFrame(tick);
+  }
+
+  function start(){
+    if(running){stop();return;}
+    running=true;
+    startTime=performance.now()-elapsed*1000;
+    // mainkan sound saat start
+    gong.currentTime = 0;
+    gong.play().catch(()=>{});
+    requestAnimationFrame(tick);
+    render();
+  }
+
+  function stop(){running=false;render();}
+  function reset(){
+    stop();
+    elapsed=0;
+    lapLogs=[];
+    timeEl.classList.remove('near','disqualified');
+    render();
+  }
+
+  function showPopup(content){
+    popupContent.innerHTML=content.replace(/\n/g,'<br>');
+    popupOverlay.style.display='flex';
+    setTimeout(()=>$('#popup').classList.add('show'),10);
+  }
+
+  popupClose.addEventListener('click',()=>{
+    $('#popup').classList.remove('show');
+    setTimeout(()=>popupOverlay.style.display='none',300);
+  });
+
+  function handleLap(){
+    const lapCount = lapLogs.length;
+    const maxLap = lapMaxCount[mode];
+
+    if(lapCount < maxLap){
+      lapLogs.push(elapsed);
+      // mainkan sound cek untuk lap
+      cek.currentTime = 0;
+      cek.play().catch(()=>{});
+      render();
+    } else {
+      lapLogs.push(elapsed);
+      stop();
+
+      // mainkan sound gong untuk hasil akhir
+      gong.currentTime = 0;
+      gong.play().catch(()=>{});
+
+      const target = targets[mode];
+      let status='Selesai', finalClass='success';
+      if(elapsed < target - tolerance || elapsed > target + tolerance){
+        status='DISKUALIFIKASI';
+        finalClass='fail';
+        timeEl.classList.add('disqualified');
+      } else {
+        timeEl.classList.remove('disqualified');
+      }
+
+      let msg = '';
+      for(let i=0;i<lapLogs.length-1;i++)
+        msg += `<div class="popup-lap">Lap ${i+1}: ${fmt(lapLogs[i])}</div>`;
+      msg += `<div class="popup-final ${finalClass}">Hasil: ${fmt(lapLogs[lapLogs.length-1])} ${status}</div>`;
+
+      showPopup(msg);
+      lapLogs = [];
+    }
+  }
+
+  segButtons.forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
+  startBtn.addEventListener('click',start);
+  resetBtn.addEventListener('click',reset);
+  lapBtn.addEventListener('click',handleLap);
+
+  settingsBtn.addEventListener('click',()=>timeSetDialog.showModal());
+  cancelTimeSet.addEventListener('click',()=>timeSetDialog.close());
+  saveTimeSet.addEventListener('click',()=>{
+    const m=Math.max(0,+startMin.value|0),s=Math.max(0,+startSec.value|0);
+    elapsed=m*60+s;
+    timeSetDialog.close();
+    render();
+  });
+
+  fullscreenBtn.addEventListener('click',()=>{
+    const el=$('#frame');
+    document.fullscreenElement?document.exitFullscreen():el.requestFullscreen().catch(()=>{});
+  });
+
+  window.addEventListener('keydown',e=>{
+    if(e.code==='Space'){e.preventDefault();start();}
+    if(e.key==='r'){reset();}
+    if(e.key==='1')setMode('pomo');
+    if(e.key==='2')setMode('short');
+    if(e.key==='3')setMode('long');
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>
